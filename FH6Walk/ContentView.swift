@@ -7,6 +7,7 @@ struct ContentView: View {
   @AppStorage("pin") private var pinText = ""
   @State private var errorText: String?
   @State private var isShowingSettings = false
+  @Environment(\.scenePhase) private var scenePhase
 
   // Must match WALK_PORT in phone_cam/walk.py.
   private static let pcPort: UInt16 = 5701
@@ -40,6 +41,18 @@ struct ContentView: View {
       }
       .sheet(isPresented: $isShowingSettings) {
         SettingsView(controls: controls)
+      }
+      // A finger on a button when the sheet opens or the app leaves the screen never
+      // reports lifting off; let go of everything instead of leaving it held.
+      .onChange(of: isShowingSettings) { _, isShowing in
+        if isShowing {
+          controls.releaseAll()
+        }
+      }
+      .onChange(of: scenePhase) { _, phase in
+        if phase != .active {
+          controls.releaseAll()
+        }
       }
     }
   }

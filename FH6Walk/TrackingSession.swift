@@ -54,6 +54,7 @@ final class TrackingSession: NSObject, ObservableObject, ARSessionDelegate {
   }
 
   func stop() {
+    controls.releaseAll()
     session.pause()
     sender?.stop()
     sender = nil

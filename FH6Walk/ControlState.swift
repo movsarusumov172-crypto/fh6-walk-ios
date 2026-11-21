@@ -40,13 +40,24 @@ final class ControlState: ObservableObject {
   init() {
     let defaults = UserDefaults.standard
     scale = Self.stored(defaults, Keys.scale, default: 1, in: Self.scaleRange)
-    joystickSpeed = Self.stored(defaults, Keys.joystickSpeed, default: 2, in: Self.joystickSpeedRange)
+    joystickSpeed = Self.stored(
+      defaults, Keys.joystickSpeed, default: 2, in: Self.joystickSpeedRange)
     smoothing = Self.stored(defaults, Keys.smoothing, default: 0.2, in: Self.smoothingRange)
     turnSensitivity = Self.stored(
       defaults, Keys.turnSensitivity, default: 1, in: Self.turnSensitivityRange)
     lockHeight = defaults.bool(forKey: Keys.lockHeight)
     noRoll = defaults.bool(forKey: Keys.noRoll)
     invertRoll = defaults.bool(forKey: Keys.invertRoll)
+  }
+
+  /// Lets go of the joystick and every held button. A gesture that SwiftUI cancels (a sheet
+  /// opening, a call, the app going to the background) may never report its end, and a stuck
+  /// "Выше" would keep the camera flying away.
+  func releaseAll() {
+    joystick = SIMD2<Float>(0, 0)
+    isUpHeld = false
+    isDownHeld = false
+    isClutchHeld = false
   }
 
   /// "Сбросить": the PC takes the current phone and camera as the new starting point.
@@ -69,7 +80,11 @@ final class ControlState: ObservableObject {
       invertRoll: invertRoll)
   }
 
-  private func save(_ value: Any, for key: String) {
+  private func save(_ value: Double, for key: String) {
+    UserDefaults.standard.set(value, forKey: key)
+  }
+
+  private func save(_ value: Bool, for key: String) {
     UserDefaults.standard.set(value, forKey: key)
   }
 
