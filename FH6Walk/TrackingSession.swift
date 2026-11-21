@@ -11,6 +11,7 @@ final class TrackingSession: NSObject, ObservableObject, ARSessionDelegate {
   @Published private(set) var positionText = ""
 
   private let session = ARSession()
+  private let controls: ControlState
   private var sender: PoseSender?
   private var pin: UInt32 = 0
   private var sequence: UInt32 = 0
@@ -19,7 +20,8 @@ final class TrackingSession: NSObject, ObservableObject, ARSessionDelegate {
   // The screen text changes a few times a second, not 60: enough to read, cheap to draw.
   private static let statusUpdateSeconds: TimeInterval = 0.25
 
-  override init() {
+  init(controls: ControlState) {
+    self.controls = controls
     super.init()
     session.delegate = self
   }
@@ -84,7 +86,9 @@ final class TrackingSession: NSObject, ObservableObject, ARSessionDelegate {
     }
     sequence &+= 1
     sender.send(
-      PosePacket.encode(pin: pin, sequence: sequence, time: time, pose: pose, tracking: tracking))
+      PosePacket.encode(
+        pin: pin, sequence: sequence, time: time, pose: pose, tracking: tracking,
+        controls: controls.packetControls))
     guard time - lastStatusUpdate >= Self.statusUpdateSeconds else {
       return
     }
