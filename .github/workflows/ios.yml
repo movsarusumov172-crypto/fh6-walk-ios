@@ -1,0 +1,61 @@
+# Сборка неподписанного IPA приложения FH6 Walk на macOS. Подписывает и ставит его Sideloadly.
+name: ios
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: macos-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Select newest Xcode
+        run: |
+          newest=$(ls -d /Applications/Xcode_*.app | sort -V | tail -n 1)
+          echo "Xcode: $newest"
+          sudo xcode-select -s "$newest"
+          xcodebuild -version
+
+      - name: Test pose packet layout
+        run: |
+          swiftc -parse-as-library FH6Walk/PosePacket.swift Tests/PosePacketTests.swift \
+            -o /tmp/pose-packet-tests
+          /tmp/pose-packet-tests
+
+      - name: Install XcodeGen
+        run: brew install xcodegen
+
+      - name: Generate Xcode project
+        run: xcodegen generate
+
+      - name: Build app without signing
+        run: |
+          set -o pipefail
+          xcodebuild \
+            -project FH6Walk.xcodeproj \
+            -scheme FH6Walk \
+            -configuration Release \
+            -sdk iphoneos \
+            -destination 'generic/platform=iOS' \
+            -derivedDataPath build \
+            CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO CODE_SIGN_IDENTITY="" \
+            build
+
+      - name: Package IPA
+        run: |
+          mkdir -p Payload
+          cp -R build/Build/Products/Release-iphoneos/FH6Walk.app Payload/
+          zip -qr FH6Walk.ipa Payload
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: FH6Walk-ipa
+          path: FH6Walk.ipa
+          retention-days: 14

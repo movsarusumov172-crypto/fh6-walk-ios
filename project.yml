@@ -1,0 +1,46 @@
+# Описание проекта для XcodeGen: Xcode-проект генерируется в CI (.github/workflows/ios.yml).
+name: FH6Walk
+options:
+  bundleIdPrefix: com.fh6phonecam
+  deploymentTarget:
+    iOS: "17.0"
+settings:
+  base:
+    SWIFT_VERSION: "5.0"
+    TARGETED_DEVICE_FAMILY: "1"
+    CODE_SIGNING_ALLOWED: "NO"
+    CODE_SIGNING_REQUIRED: "NO"
+targets:
+  FH6Walk:
+    type: application
+    platform: iOS
+    sources:
+      - FH6Walk
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.fh6phonecam.walk
+        MARKETING_VERSION: "1.0"
+        CURRENT_PROJECT_VERSION: "1"
+        GENERATE_INFOPLIST_FILE: "NO"
+    info:
+      path: FH6Walk/Info.plist
+      properties:
+        CFBundleDisplayName: FH6 Walk
+        CFBundleShortVersionString: $(MARKETING_VERSION)
+        CFBundleVersion: $(CURRENT_PROJECT_VERSION)
+        LSRequiresIPhoneOS: true
+        UILaunchScreen: {}
+        UIApplicationSceneManifest:
+          UIApplicationSupportsMultipleScenes: false
+        UISupportedInterfaceOrientations:
+          - UIInterfaceOrientationPortrait
+          - UIInterfaceOrientationLandscapeLeft
+          - UIInterfaceOrientationLandscapeRight
+        UIRequiredDeviceCapabilities:
+          - arkit
+        NSCameraUsageDescription: >-
+          Камера нужна ARKit, чтобы понять, где телефон в комнате. Изображение никуда
+          не передаётся.
+        NSLocalNetworkUsageDescription: >-
+          Приложение отправляет положение телефона программе FH6 Phone Cam на вашем ПК
+          в домашней сети.
