@@ -9,7 +9,7 @@ struct PosePacketTests {
   static func main() {
     let pose = PosePacket.Pose(
       position: SIMD3<Float>(1.5, -0.25, 3.0),
-      orientation: simd_quatf(ix: 0, iy: 0.5, iz: 0, r: 0.75))
+      orientation: simd_quatf(ix: 0, iy: 0.6, iz: 0, r: 0.8))
     let packet = PosePacket.encode(
       pin: 424_242, sequence: 7, time: 12.5, pose: pose, tracking: .normal)
 
@@ -23,9 +23,9 @@ struct PosePacketTests {
     expect(readFloat(packet, at: 28) == -0.25, "y")
     expect(readFloat(packet, at: 32) == 3.0, "z")
     expect(readFloat(packet, at: 36) == 0, "quaternion x")
-    expect(readFloat(packet, at: 40) == 0.5, "quaternion y")
+    expect(readFloat(packet, at: 40) == 0.6, "quaternion y")
     expect(readFloat(packet, at: 44) == 0, "quaternion z")
-    expect(readFloat(packet, at: 48) == 0.75, "quaternion w")
+    expect(readFloat(packet, at: 48) == 0.8, "quaternion w")
     expect(packet[52] == PosePacket.Tracking.normal.rawValue, "tracking byte")
     expect(Array(packet.suffix(3)) == [0, 0, 0], "padding is zero")
     print("PosePacketTests: all checks passed")

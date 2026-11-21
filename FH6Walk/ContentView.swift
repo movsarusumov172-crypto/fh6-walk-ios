@@ -6,7 +6,7 @@ struct ContentView: View {
   @AppStorage("pin") private var pinText = ""
   @State private var errorText: String?
 
-  // Must match WALK_PORT in phone_cam/walk_control.py.
+  // Must match WALK_PORT in phone_cam/walk.py.
   private static let pcPort: UInt16 = 5701
   private static let pinLength = 6
 
@@ -15,7 +15,8 @@ struct ContentView: View {
       Form {
         Section("Компьютер") {
           TextField("IP-адрес ПК, например 192.168.0.57", text: $pcAddress)
-            .keyboardType(.decimalPad)
+            // Not .decimalPad: with a Russian locale it shows a comma instead of a dot.
+            .keyboardType(.numbersAndPunctuation)
             .textInputAutocapitalization(.never)
             .autocorrectionDisabled()
           TextField("PIN из окна программы на ПК", text: $pinText)
