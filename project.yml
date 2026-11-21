@@ -30,6 +30,9 @@ targets:
         CFBundleVersion: $(CURRENT_PROJECT_VERSION)
         LSRequiresIPhoneOS: true
         UILaunchScreen: {}
+        # Always the whole screen: no Split View on iPad, and Xcode stops asking for every
+        # orientation.
+        UIRequiresFullScreen: true
         UIApplicationSceneManifest:
           UIApplicationSupportsMultipleScenes: false
         UISupportedInterfaceOrientations:
